@@ -24,11 +24,13 @@ module Stupid
 			
 			context.params.merge!(path_params)
 			
-			controller.run_before_filters(context)
-			
-			context.response.body = action.call(context)
-			
-			controller.run_after_filters(context)
+			begin
+				controller.run_before_filters(context)
+				action.call(context)
+				controller.run_after_filters(context)
+			rescue Return => ex
+				puts "Hard return: #{ex.class}"
+			end
 			
 			p context
 			[context.response.status, context.response.headers, context.response.body]

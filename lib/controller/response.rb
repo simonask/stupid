@@ -7,6 +7,7 @@ module Stupid
 		def initialize
 			@headers = {"Content-Type" => "text/html; charset=utf-8"}
 			@status = 200
+			@body = ''
 		end
 	end
 end

@@ -47,14 +47,6 @@ module Stupid
 				action(:index, '', &block)
 			end
 			
-			def design(name)
-				before { @__design = name }
-			end
-			
-			def layout(name)
-				before { @__layout = name }
-			end
-			
 			def recognize_path(path, &block)
 				path ||= ''
 				# Namespaces and actions have different recognition semantics, so this gets a bit messy.
@@ -79,26 +71,6 @@ module Stupid
 						puts "Namespace matched: #{namespace.inspect}"
 						m.names.map {|k| k.to_sym }.each {|k| block.call(k, m[k]) } if block_given?
 						return namespace.recognize_path(remaining_path, &block)
-					end
-				end
-				
-				raise "Could not recognize path #{path}"
-			end
-			
-			def old_recognize_path(path)
-				puts "Calling #{self}.recognize_path(#{path.inspect})"
-				path ||= ''
-				first_path_element, remaining_path = path.split('/', 2).reject(&:empty?)
-				first_path_element ||= ''
-				
-				@paths.each do |name, action|
-					case action.cognate
-					when Regexp
-						return action if path =~ action.cognate
-						return action.recognize_path(remaining_path) if action.cognate.match(first_path_element)
-					else
-						return action if path == action.cognate
-						return action.recognize_path(remaining_path) if first_path_element == action.cognate
 					end
 				end
 				

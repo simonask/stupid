@@ -7,7 +7,6 @@ root do
 	
 	before do
 		puts "before 1"
-		@hejsa = 123
 	end
 	
 	after { puts "after 1" }
@@ -32,7 +31,7 @@ root do
 		end
 		
 		action :test, /^test\/(?<id>\d+)$/ do
-			@lol = "TEST JA"
+			render!("Called with id: #{params[:id]}")
 		end
 		
 		namespace :nested, 'nested' do
