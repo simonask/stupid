@@ -1,13 +1,12 @@
-require 'lib/ext/map_to_hash'
-require 'lib/ext/hash_with_indifferent_access'
-
 require 'rubygems'
-require 'rack'
-require 'lib/application'
-require 'config/config'
-require 'lib/route'
-require 'lib/request'
-require 'lib/response'
-require 'lib/context'
-require 'lib/action'
-require 'lib/controller'
+require 'pathname'
+
+STUPID_ROOT = Pathname.new(File.dirname(__FILE__) + "/..").realpath.to_s
+
+STUPID_LOAD_DIRS = ['lib', 'config', 'app']
+
+STUPID_LOAD_DIRS.each do |dir|
+	Dir.glob("#{STUPID_ROOT}/#{dir}/**/*.rb").each do |file|
+		require file
+	end
+end
