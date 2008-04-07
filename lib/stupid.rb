@@ -1,9 +1,13 @@
+require 'lib/ext/map_to_hash'
+require 'lib/ext/hash_with_indifferent_access'
+
 require 'rubygems'
 require 'rack'
 require 'lib/application'
 require 'config/config'
 require 'lib/route'
+require 'lib/request'
+require 'lib/response'
+require 'lib/context'
+require 'lib/action'
 require 'lib/controller'
-
-require 'app/controllers/test'
-require 'app/controllers/test2'

@@ -1,38 +1,62 @@
 module Stupid
 	class Controller
+		attr_reader :request
+		def initialize(request)
+			@request = request
+		end
+		
 		class << self
-			attr_accessor :paths
+			attr_accessor :name
+			attr_accessor :cognate
+			attr :paths
 			
-			def /(subpath)
-				Route.new(self, subpath)
-			end
-			
-			def inherited(subclass)
-				(@paths || []).each do |path|
-					Route.register_class(subclass, path)
+			def namespace(name, cognate = nil, &block)
+				@paths ||= {}
+				if @paths[name] && !cognate
+					c = @paths[name]
+				else
+					c = Class.new(Stupid::Controller)
+					c.cognate = cognate
+					c.name = name
+					self.module_eval("#{'::' if self == Stupid::Controller}#{name.capitalize} = c")
+					@paths[name] = c
 				end
-				puts "Class inherited: #{subclass} with paths: #{@paths}"
+				c.class_eval(&block) if block_given?
+				c
 			end
 			
-			def path(name, p, &block)
-				Route.register_path(self, name, p)
-				obj = BasicObject.new
-				obj.instance_eval(&block)
-				@subpaths ||= []
-				@subpaths[name] = obj
+			def action(name, cognate, &block)
+				@paths ||= {}
+				@paths[name] = Stupid::Action.new(self, name, cognate, &block)
 			end
 			
-			def handle_route(route)
-				raise "bleh?" unless route.elements.first == self
-				@instance ||= self.new
+			def index(&block)
+				action(:index, '', &block)
+			end
+			
+			def recognize_path(path)
+				puts "Calling #{self}.recognize_path(#{path.inspect})"
+				path ||= ''
+				first_path_element, remaining_path = path.split('/', 2).reject(&:empty?)
+				first_path_element ||= ''
 				
+				@paths.each do |name, action|
+					case action.cognate
+					when Regexp
+						return action if path =~ action.cognate
+						return action.recognize_path(remaining_path) if action.cognate.match(first_path_element)
+					else
+						return action if path == action.cognate
+						return action.recognize_path(remaining_path) if first_path_element == action.cognate
+					end
+				end
+				
+				raise "Could not recognize path #{path}"
 			end
 		end
 	end
 end
 
-def P(*paths)
-	c = Class.new(Stupid::Controller)
-	c.paths = paths
-	c
+def root(&block)
+	Stupid::Controller.instance_eval(&block)
 end
