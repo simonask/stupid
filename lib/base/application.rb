@@ -7,7 +7,6 @@ module Stupid
 			path = env['PATH_INFO'].sub(/^\//, '')
 			path_params = {}
 			action = Stupid::Controller.recognize_path(path) { |param, value|
-				puts "BLOCK CALLED: #{param.inspect}, #{value.inspect}"
 				path_params[param] = value
 			}
 			
@@ -34,7 +33,6 @@ module Stupid
 				puts "Hard return: #{ex.class}"
 			end
 			
-			p context
 			[context.response.status, context.response.headers, context.response.body]
 		end
 		
