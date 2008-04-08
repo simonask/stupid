@@ -1,3 +1,5 @@
+require 'erb'
+
 module Stupid
 	class Controller
 		module Layout
@@ -13,18 +15,25 @@ module Stupid
 		module Render
 			class RenderReturn < Return; end
 			
+			# Make public.
+			def binding; super; end
+			
 			def rendered?
 				@__rendered
 			end
 			
-			def render(options = {})
+			def render_as_string(options = {})
 				options = {:template => options} unless options.is_a?(Hash)
 				
 				if options[:text]
-					response.body = options[:text]
+					options[:text]
 				else
 					render_template(options)
 				end
+			end
+			
+			def render(*args)
+				response.body = render_as_string(*args)
 				@__rendered = true
 			end
 			
@@ -33,25 +42,30 @@ module Stupid
 				raise RenderReturn
 			end
 			
-			protected
-			def render_template(options = {})
-				design = @__design || 'default'
-				layout = @__layout
-				auto_template = current_controller.parents.map {|c| c.name }.compact.join('/')
-				options = {
-					:template => auto_template,
-					:design => design,
-					:layout => layout,
-				}.merge(options)
-				
-				template_path = "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:template]}"
-				layout_path = layout ? "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:layout]}" : nil
-				
-				response.body = "rendering #{template_path} with layout #{layout_path}"
+			def content_for_layout=(content)
+				@__content_for_layout = content
 			end
 			
-			def render_template_file_in_context(file, context, &block)
+			def content_for_layout
+				@__content_for_layout
+			end
+			
+			protected
+			def render_template(options = {})
+				options[:template] ||= current_controller.parents.map {|c| c.name }.compact.join('/') + "/#{current_action.name}"
+				options[:design] ||= @__design || 'default' if options[:design].nil?	# distinguish between nil and false
+				options[:layout] ||= @__layout if options[:layout].nil?
 				
+				template_path = "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:template]}.html.erb"
+				layout_path = options[:layout] ? "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:layout]}.html.erb" : nil
+				
+				self.content_for_layout = render_template_file(template_path)
+				options[:layout] ? render_template_file(layout_path) : self.content_for_layout
+			end
+			
+			def render_template_file(file)
+				erb = ERB.new(File.open(file).read)
+				erb.result(self.binding)
 			end
 		end
 	end
