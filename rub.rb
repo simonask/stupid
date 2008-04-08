@@ -6,6 +6,10 @@ root do
 	design 'test'
 	layout 'default'
 	
+	index do
+		render :text => "LOL"
+	end
+	
 	before do
 		puts "before 1"
 	end
@@ -13,12 +17,12 @@ root do
 	after { puts "after 1" }
 	after { puts "after 1 1" }
 	
-	controller :lol, 'lol(?<name>.+)?' do
+	controller :lol, /lol(?<name>.+)?/ do
 		before { puts "before 2" }
 		after { puts "after 2" }
 		
 		index do
-			"HEJSA"
+			render :text => "HEJSA"
 		end
 		
 		action :test, /^test\/(?<id>\d+)$/ do
@@ -27,7 +31,7 @@ root do
 		
 		controller :nested, 'nested' do
 			index do
-				render "DAV"
+				render :text => "DAV"
 			end
 		end
 	end
@@ -36,7 +40,7 @@ end
 root do
 	controller :lol do
 		action :test2, 'test2' do
-			render "TEST2 VIRKEdE!"
+			render :text => "TEST2 VIRKEdE!"
 		end
 	end
 end
