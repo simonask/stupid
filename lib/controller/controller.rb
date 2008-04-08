@@ -25,12 +25,16 @@ module Stupid
 			include Stupid::Cognite
 			attr :paths
 			
+			def paths
+				@paths ||= {}
+			end
+			
 			def controllers
-				(@paths ||= {}).select {|n, p| p.is_a?(Class) }
+				paths.select {|n, p| p.is_a?(Class) }
 			end
 			
 			def actions
-				(@paths ||= {}).select {|n, p| p.is_a?(Stupid::Action) }
+				paths.select {|n, p| p.is_a?(Stupid::Action) }
 			end
 			
 			def controller(name, cognate = nil, &block)
