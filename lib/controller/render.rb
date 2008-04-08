@@ -13,6 +13,10 @@ module Stupid
 		module Render
 			class RenderReturn < Return; end
 			
+			def rendered?
+				@__rendered
+			end
+			
 			def render(options = {})
 				options = {:template => options} unless options.is_a?(Hash)
 				
@@ -21,6 +25,7 @@ module Stupid
 				else
 					render_template(options)
 				end
+				@__rendered = true
 			end
 			
 			def render!(*args)
@@ -43,6 +48,10 @@ module Stupid
 				layout_path = layout ? "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:layout]}" : nil
 				
 				response.body = "rendering #{template_path} with layout #{layout_path}"
+			end
+			
+			def render_template_file_in_context(file, context, &block)
+				
 			end
 		end
 	end

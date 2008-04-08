@@ -28,6 +28,7 @@ module Stupid
 			begin
 				controller.run_before_filters(context)
 				action.call(context)
+				context.render unless context.rendered?
 				controller.run_after_filters(context)
 			rescue Return => ex
 				puts "Hard return: #{ex.class}"
