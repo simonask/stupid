@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), 'cognite')
+
 module Stupid
 	class Controller
 		attr_accessor :current_action
@@ -11,15 +13,17 @@ module Stupid
 			current_action.controller
 		end
 		
+		def /(path_element)
+			self.class / path_element
+		end
+		
+		def parent
+			self.class.parent
+		end
+		
 		class << self
-			attr_accessor :name
-			attr_accessor :cognate
+			include Stupid::Cognite
 			attr :paths
-			
-			def cognate
-				return @cognate if @cognate.is_a?(Regexp)
-				/^#{Regexp.escape(@cognate.to_s)}$/
-			end
 			
 			def controllers
 				(@paths ||= {}).select {|n, p| p.is_a?(Class) }
@@ -35,7 +39,8 @@ module Stupid
 				if @paths[name] && !cognate
 					c = @paths[name]
 				else
-					c = Class.new(self)
+					@paths[name] ||= Class.new(self)
+					c = @paths[name]
 					c.cognate = cognate
 					c.name = name
 					self.module_eval("#{'::' if self == Stupid::Controller}#{name.capitalize}Controller = c")
@@ -93,10 +98,15 @@ module Stupid
 				end
 				ret
 			end
+			
+			def /(path_element)
+				Route.new(self) / path_element
+			end
 		end
 	end
 end
 
 def root(&block)
-	Stupid::Controller.instance_eval(&block)
+	Stupid::Controller.instance_eval(&block) if block_given?
+	Stupid::Controller
 end

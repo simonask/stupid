@@ -1,20 +1,16 @@
+require File.join(File.dirname(__FILE__), 'cognite')
+
 module Stupid
 	class Action
-		attr_accessor :cognate
+		include Stupid::Cognite
 		attr :controller
 		attr :action
-		attr :name
-		
-		def cognate
-			return @cognate if @cognate.is_a?(Regexp)
-			/^#{Regexp.escape(@cognate.to_s)}$/
-		end
 		
 		def initialize(klass, name, cognate, &block)
-			@cognate = cognate
+			self.name = name
+			self.cognate = cognate
 			@controller = klass
 			@action = block
-			@name = name
 		end
 		
 		def call(context)
