@@ -1,8 +1,14 @@
 module Stupid
 	class Controller
+		attr_accessor :current_action
+		
 		def initialize(env)
 			@__request = Stupid::Request.new(env)
 			@__response = Stupid::Response.new
+		end
+		
+		def current_controller
+			current_action.controller
 		end
 		
 		class << self
@@ -15,7 +21,7 @@ module Stupid
 				/^#{@cognate.to_s}$/
 			end
 			
-			def namespaces
+			def controllers
 				(@paths ||= {}).select {|n, p| p.is_a?(Class) }
 			end
 			
@@ -23,8 +29,9 @@ module Stupid
 				(@paths ||= {}).select {|n, p| p.is_a?(Stupid::Action) }
 			end
 			
-			def namespace(name, cognate = nil, &block)
-				@patha ||= {}
+			def controller(name, cognate = nil, &block)
+				@paths ||= {}
+				c = nil
 				if @paths[name] && !cognate
 					c = @paths[name]
 				else
@@ -66,15 +73,25 @@ module Stupid
 				first_path_element, remaining_path = path.split('/', 2).reject(&:empty?)
 				first_path_element ||= ''
 				
-				namespaces.each do |name, namespace|
-					if m = namespace.cognate.match(first_path_element)
-						puts "Namespace matched: #{namespace.inspect}"
+				controllers.each do |name, controller|
+					if m = controller.cognate.match(first_path_element)
+						puts "Namespace matched: #{controller.inspect}"
 						m.names.map {|k| k.to_sym }.each {|k| block.call(k, m[k]) } if block_given?
-						return namespace.recognize_path(remaining_path, &block)
+						return controller.recognize_path(remaining_path, &block)
 					end
 				end
 				
 				raise "Could not recognize path #{path}"
+			end
+			
+			def parents
+				ret = []
+				cur = self
+				until cur == Object
+					ret.unshift(cur)
+					cur = cur.superclass
+				end
+				ret
 			end
 		end
 	end

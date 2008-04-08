@@ -4,6 +4,7 @@ require 'lib/stupid'
 
 root do
 	design 'test'
+	layout 'default'
 	
 	before do
 		puts "before 1"
@@ -12,17 +13,7 @@ root do
 	after { puts "after 1" }
 	after { puts "after 1 1" }
 	
-	def testit
-		@hej ||= 0
-		@hej += 1
-		@hej.to_s
-	end
-	
-	index do
-		testit
-	end
-	
-	namespace :lol, 'lol(?<name>.+)?' do
+	controller :lol, 'lol(?<name>.+)?' do
 		before { puts "before 2" }
 		after { puts "after 2" }
 		
@@ -31,18 +22,24 @@ root do
 		end
 		
 		action :test, /^test\/(?<id>\d+)$/ do
-			render!("Called with id: #{params[:id]}")
+			render
 		end
 		
-		namespace :nested, 'nested' do
+		controller :nested, 'nested' do
 			index do
-				"DAV"
+				render "DAV"
 			end
 		end
 	end
 end
 
-puts LolController.superclass
+root do
+	controller :lol do
+		action :test2, 'test2' do
+			render "TEST2 VIRKEdE!"
+		end
+	end
+end
 
 def print_paths(controller, indent = 0, indent_str = "  ")
 	controller.paths.each do |name, sub|

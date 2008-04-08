@@ -20,6 +20,7 @@ module Stupid
 			controller ||= action.controller
 			
 			context = controller.new(env)
+			context.current_action = action
 			context.metaclass.instance_eval { include Stupid::ControllerConvenience }
 			
 			context.params.merge!(path_params)
