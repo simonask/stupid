@@ -56,8 +56,8 @@ module Stupid
 				options[:design] ||= @__design || 'default' if options[:design].nil?	# distinguish between nil and false
 				options[:layout] ||= @__layout if options[:layout].nil?
 				
-				template_path = "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:template]}.html.erb"
-				layout_path = options[:layout] ? "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:layout]}.html.erb" : nil
+				template_path = "#{STUPID_ROOT}/designs/#{options[:design]}/#{options[:template]}.html.erb"
+				layout_path = options[:layout] ? "#{STUPID_ROOT}/designs/#{options[:design]}/#{options[:layout]}.html.erb" : nil
 				
 				self.content_for_layout = render_template_file(template_path)
 				options[:layout] ? render_template_file(layout_path) : self.content_for_layout
