@@ -26,7 +26,8 @@ root do
 		end
 		
 		action :test, /^test\/(?<id>\d+)$/ do
-			render
+			@id = params[:id].to_i
+			@name = params[:name]
 		end
 		
 		controller :nested, 'nested' do
