@@ -14,12 +14,25 @@ module Stupid
 			class RenderReturn < Return; end
 			
 			def render(options = {})
-				options = {:template => options} if options.is_a?(String)
+				options = {:template => options} unless options.is_a?(Hash)
 				
+				if options[:text]
+					response.body = options[:text]
+				else
+					render_template(options)
+				end
+			end
+			
+			def render!(*args)
+				render(*args)
+				raise RenderReturn
+			end
+			
+			protected
+			def render_template(options = {})
 				design = @__design || 'default'
 				layout = @__layout
 				auto_template = current_controller.parents.map {|c| c.name }.compact.join('/')
-				
 				options = {
 					:template => auto_template,
 					:design => design,
@@ -30,11 +43,6 @@ module Stupid
 				layout_path = layout ? "#{STUPID_ROOT}/app/designs/#{options[:design]}/#{options[:layout]}" : nil
 				
 				response.body = "rendering #{template_path} with layout #{layout_path}"
-			end
-			
-			def render!(*args)
-				render(*args)
-				raise RenderReturn
 			end
 		end
 	end
