@@ -7,7 +7,7 @@ module Stupid
 		
 		def cognate
 			return @cognate if @cognate.is_a?(Regexp)
-			/^#{@cognate.to_s}$/
+			/^#{Regexp.escape(@cognate.to_s)}$/
 		end
 		
 		def initialize(klass, name, cognate, &block)
