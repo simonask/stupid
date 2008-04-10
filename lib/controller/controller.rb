@@ -54,9 +54,10 @@ module Stupid
 				c
 			end
 			
-			def action(name, cognate, &block)
+			def action(name, cognate = nil, &block)
 				@paths ||= {}
-				@paths[name] = Stupid::Action.new(self, name, cognate, &block)
+				@paths[name] = Stupid::Action.new(self, name, cognate, &block) if block_given? && !cognate.nil?
+				@paths[name]
 			end
 			
 			def index(&block)
