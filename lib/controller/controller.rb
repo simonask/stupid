@@ -47,6 +47,10 @@ module Stupid
 					c = @paths[name]
 					c.cognate = cognate
 					c.name = name
+					
+					# Assign the new class to a constant. This name is never used internally, but
+					# helps tremendously in debugging (because Ruby givea a class a name when
+					# it is assigned to a constant).
 					self.module_eval("#{'::' if self == Stupid::Controller}#{name.capitalize}Controller = c")
 					@paths[name] = c
 				end
