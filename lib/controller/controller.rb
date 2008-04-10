@@ -59,7 +59,10 @@ module Stupid
 			
 			def action(name, cognate = nil, &block)
 				@paths ||= {}
-				@paths[name] = Stupid::Action.new(self, name, cognate, &block) if block_given? && !cognate.nil?
+				if block_given? && !cognate.nil?
+					warn "WARNING: Overriding action #{self}/#{name}" if @paths[name]
+					@paths[name] = Stupid::Action.new(self, name, cognate, &block)
+				end
 				@paths[name]
 			end
 			
