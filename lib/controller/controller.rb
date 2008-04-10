@@ -52,7 +52,6 @@ module Stupid
 					# helps tremendously in debugging (because Ruby givea a class a name when
 					# it is assigned to a constant).
 					self.module_eval("#{'::' if self == Stupid::Controller}#{name.capitalize}Controller = c")
-					@paths[name] = c
 				end
 				c.module_eval(&block) if block_given?
 				c
